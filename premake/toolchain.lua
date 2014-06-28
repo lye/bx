@@ -20,6 +20,7 @@ function toolchain(_buildDir, _libDir)
 			{ "freebsd", "FreeBSD" },
 			{ "linux-gcc", "Linux (GCC compiler)" },
 			{ "linux-clang", "Linux (Clang compiler)" },
+			{ "freebsd-gcc", "FreeBSD (GCC compiler)" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
 			{ "nacl-arm", "Native Client - ARM" },
@@ -101,6 +102,19 @@ function toolchain(_buildDir, _libDir)
 
 		if "freebsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd")
+		end
+
+		if "freebsd-gcc" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "gcc47"
+			premake.gcc.cxx = "g++47"
+			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd")
+		end
+
+		if "freebsd-clang" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "clang"
+			premake.gcc.cxx = "clang++"
+			premake.gcc.ar = "ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd-clang")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
@@ -368,7 +382,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-m64",
 		}
-
 	configuration { "android-*" }
 		flags {
 			"NoImportLib",
@@ -489,13 +502,57 @@ function toolchain(_buildDir, _libDir)
 			"-Wno-warn-absolute-paths",
 		}
 
-	configuration { "freebsd" }
-		targetdir (_buildDir .. "freebsd" .. "/bin")
-		objdir (_buildDir .. "freebsd" .. "/obj")
-		libdirs { _libDir .. "lib/freebsd" }
+	configuration { "freebsd-*" }
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-Wunused-value",
+			"-msse2",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
 		includedirs { 
 			bxDir .. "include/compat/freebsd",
 		}
+
+	configuration { "freebsd-gcc" }
+		buildoptions {
+			"-mfpmath=sse",
+		}
+
+	configuration { "freebsd-gcc", "x32" }
+		targetdir (_buildDir .. "freebsd32_gcc" .. "/bin")
+		objdir (_buildDir .. "freebsd32_gcc" .. "/obj")
+		libdirs { _libDir .. "lib/freebsd32_gcc" }
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "freebsd-gcc", "x64" }
+		targetdir (_buildDir .. "freebsd64_gcc" .. "/bin")
+		objdir (_buildDir .. "freebsd64_gcc" .. "/obj")
+		libdirs { _libDir .. "lib/freebsd64_gcc" }
+		buildoptions {
+			"-m64",
+		}
+
+	configuration { "freebsd-clang", "x32" }
+		targetdir (_buildDir .. "freebsd32_clang" .. "/bin")
+		objdir (_buildDir .. "freebsd32_clang" .. "/obj")
+		libdirs { _libDir .. "lib/freebsd32_clang" }
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "freebsd-clang", "x64" }
+		targetdir (_buildDir .. "freebsd64_clang" .. "/bin")
+		objdir (_buildDir .. "freebsd64_clang" .. "/obj")
+		libdirs { _libDir .. "lib/freebsd64_clang" }
+		buildoptions {
+			"-m64",
+		}
+
 
 	configuration { "nacl or nacl-arm or pnacl" }
 		includedirs { 

@@ -1,0 +1,8 @@
+#!/bin/sh
+PREMAKE4=`which premake4`
+if [ x$PREMAKE4 = x -o \! -f $PREMAKE4 ] ; then
+	echo "XXX: we need the beta5 install of premake4, which isn't yet in ports ;_;"
+	exit 1
+fi
+
+$PREMAKE4 $@

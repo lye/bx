@@ -4,9 +4,13 @@
 #
 
 UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin FreeBSD))
+ifeq ($(UNAME),$(filter $(UNAME),Darwin FreeBSD))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
+else
+OS=freebsd
+endif
 else
 OS=linux
 endif
@@ -28,6 +32,7 @@ all:
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=pnacl gmake
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=mingw gmake
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=linux-gcc gmake
+	$(PREMAKE4) --file=premake/premake4.lua --gcc=freebsd-gcc gmake
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=osx gmake
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-arm gmake
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-simulator gmake
@@ -68,6 +73,14 @@ linux-debug64: .build/projects/gmake-linux
 linux-release64: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=release64
 linux: linux-debug32 linux-release32 linux-debug64 linux-release64
+
+.build/projects/gmake-freebsd:
+	$(PREMAKE4) --file=premake/premake4.lua --gcc=freebsd-gcc gmake
+freebsd-debug64: .build/projects/gmake-freebsd
+	gmake -R -C .build/projects/gmake-freebsd config=debug64
+freebsd-release64: .build/projects/gmake-freebsd
+	gmake -R -C .build/projects/gmake-freebsd config=release64
+freebsd: freebsd-debug64 freebsd-release64
 
 .build/projects/gmake-mingw:
 	$(PREMAKE4) --file=premake/premake4.lua --gcc=mingw gmake

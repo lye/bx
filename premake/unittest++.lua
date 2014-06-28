@@ -29,7 +29,7 @@ project "UnitTest++"
 		"../3rdparty/UnitTest++/src/*.h",
 	}
 
-	configuration { "linux or osx or android-* or *nacl*" }
+	configuration { "linux or freebsd* or osx or android-* or *nacl*" }
 		files {
 			"../3rdparty/UnitTest++/src/Posix/**.cpp",
 			"../3rdparty/UnitTest++/src/Posix/**.h",
